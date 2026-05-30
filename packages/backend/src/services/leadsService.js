@@ -1,8 +1,16 @@
 const createError = require("http-errors");
-const leadsRepo = require("../repositories/leadsRepo");
+// const leadsRepo = require("../repositories/leadsRepo");
+const leadsRepo = require("../repos/leadsRepo");
 
-async function list() {
-  return leadsRepo.list();
+async function list(query, user) {
+  const filters = { ...query };
+
+  // Agents only see their own leads
+  if (user.role !== "admin") {
+    filters.assignedTo = user.id;
+  }
+
+  return leadsRepo.list(filters);
 }
 
 async function getOne(id) {

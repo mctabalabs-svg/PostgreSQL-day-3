@@ -1,20 +1,22 @@
 const express = require("express");
 const leadsService = require("../services/leadsService");
-
+const requireAuth = require("../middleware/requireAuth");
 const router = express.Router();
 
-// GET all leads
-router.get("/", async (req, res, next) => {
+router.get("/", requireAuth, async (req, res, next) => {
   try {
-    const leads = await leadsService.list();
-    res.json(leads);
+    const leads = await leadsService.list(req.query, req.user);
+
+    res.json({
+      data: leads,
+    });
   } catch (err) {
     next(err);
   }
 });
 
 // GET stats
-router.get("/stats", async (req, res, next) => {
+router.get("/stats", requireAuth, async (req, res, next) => {
   try {
     const stats = await leadsService.stats();
     res.json(stats);
@@ -24,7 +26,7 @@ router.get("/stats", async (req, res, next) => {
 });
 
 // GET one lead
-router.get("/:id", async (req, res, next) => {
+router.get("/:id", requireAuth, async (req, res, next) => {
   try {
     const lead = await leadsService.getOne(req.params.id);
     res.json(lead);
@@ -34,7 +36,7 @@ router.get("/:id", async (req, res, next) => {
 });
 
 // UPDATE lead
-router.put("/:id", async (req, res, next) => {
+router.put("/:id", requireAuth, async (req, res, next) => {
   try {
     const updated = await leadsService.update(
       req.params.id,
@@ -47,7 +49,7 @@ router.put("/:id", async (req, res, next) => {
   }
 });
 
-router.patch("/:id", async (req, res, next) => {
+router.patch("/:id", requireAuth, async (req, res, next) => {
   try {
     const updated = await leadsService.update(
       req.params.id,
